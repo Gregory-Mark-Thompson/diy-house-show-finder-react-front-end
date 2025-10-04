@@ -6,45 +6,45 @@ import SignUpForm from './components/SignUpForm/SignUpForm';
 import SignInForm from './components/SignInForm/SignInForm';
 import Landing from './components/Landing/Landing';
 import Dashboard from './components/Dashboard/Dashboard';
-import HootList from './components/HootList/HootList';
-import * as hootService from './services/hootService';
+import GigList from './components/GigList/GigList';
+import * as gigService from './services/gigService';
 import { UserContext } from './contexts/UserContext';
-import HootDetails from './components/HootDetails/HootDetails';
-import HootForm from './components/HootForm/HootForm';
+import GigDetails from './components/GigDetails/GigDetails';
+import GigForm from './components/GigForm/GigForm';
 import CommentForm from './components/CommentForm/CommentForm';
 
 
 const App = () => {
   const navigate = useNavigate();
-  const [hoots, setHoots] = useState([]);
+  const [gigs, setGigs] = useState([]);
   const { user } = useContext(UserContext);
   
-  const handleAddHoot = async (hootFormData) => {
-    const newHoot = await hootService.create(hootFormData);
-    setHoots([newHoot, ...hoots]);
-    navigate('/hoots');
+  const handleAddGig = async (gigFormData) => {
+    const newGig = await gigService.create(gigFormData);
+    setGigs([newGig, ...gigs]);
+    navigate('/gigs');
   };
 
-const handleDeleteHoot = async (hootId) => {
-  const deletedHoot = await hootService.deleteHoot(hootId);
-  setHoots(hoots.filter((hoot) => hoot._id !== hootId));
-  navigate('/hoots');
+const handleDeleteGig = async (gigId) => {
+  const deletedGig = await gigService.deleteGig(gigId);
+  setGigs(gigs.filter((gig) => gig._id !== gigId));
+  navigate('/gigs');
 };
 
-const handleUpdateHoot = async (hootId, hootFormData) => {
-  const updatedHoot = await hootService.update(hootId, hootFormData);
-  setHoots(hoots.map((hoot) => (hootId === hoot._id ? updatedHoot : hoot)));
-  navigate(`/hoots/${hootId}`);
+const handleUpdateGig = async (gigId, gigFormData) => {
+  const updatedGig = await gigService.update(gigId, gigFormData);
+  setGigs(gigs.map((gig) => (gigId === gig._id ? updatedGig : gig)));
+  navigate(`/gigs/${gigId}`);
 };
 
   useEffect(() => {
-    const fetchAllHoots = async () => {
-      const hootsData = await hootService.index();
+    const fetchAllGigs = async () => {
+      const gigsData = await gigService.index();
   
       // console log to verify
-      setHoots(hootsData);
+      setGigs(gigsData);
     };
-    if (user) fetchAllHoots();
+    if (user) fetchAllGigs();
   }, [user]);
   
   // return statement code here
@@ -58,21 +58,21 @@ const handleUpdateHoot = async (hootId, hootFormData) => {
         {user ? (
           <>
             {/* Protected routes (available only to signed-in users) */}
-            <Route path='/hoots' element={<HootList hoots={hoots} />} />
+            <Route path='/gigs' element={<GigList gigs={gigs} />} />
             <Route 
-              path='/hoots/:hootId'
-              element={<HootDetails handleDeleteHoot={handleDeleteHoot}/>}
+              path='/gigs/:gigId'
+              element={<GigDetails handleDeleteGig={handleDeleteGig}/>}
             />
             <Route 
-              path='/hoots/new' 
-              element={<HootForm handleAddHoot={handleAddHoot} />}
+              path='/gigs/new' 
+              element={<GigForm handleAddGig={handleAddGig} />}
             />
             <Route
-              path='/hoots/:hootId/edit'
-              element={<HootForm handleUpdateHoot={handleUpdateHoot}/>}
+              path='/gigs/:gigId/edit'
+              element={<GigForm handleUpdateGig={handleUpdateGig}/>}
             />
             <Route
-              path='/hoots/:hootId/comments/:commentId/edit'
+              path='/gigs/:gigId/comments/:commentId/edit'
               element={<CommentForm />}
             />
           </>

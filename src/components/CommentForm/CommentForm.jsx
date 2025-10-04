@@ -1,21 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
 
-import * as hootService from '../../services/hootService';
+import * as gigService from '../../services/gigService';
 
 const CommentForm = (props) => {
   const [formData, setFormData] = useState({ text: '' });
-  const { hootId, commentId } = useParams();
+  const { gigId, commentId } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
-  const fetchHoot = async () => {
-    const hootData = await hootService.show(hootId);
-    // Find comment in fetched hoot data
-    setFormData(hootData.comments.find((comment) => comment._id === commentId));
+  const fetchGig = async () => {
+    const gigData = await gigService.show(gigId);
+    // Find comment in fetched gig data
+    setFormData(gigData.comments.find((comment) => comment._id === commentId));
   };
-  if (hootId && commentId) fetchHoot();
-}, [hootId, commentId]);
+  if (gigId && commentId) fetchGig();
+}, [gigId, commentId]);
 
   const handleChange = (evt) => {
     setFormData({ ...formData, [evt.target.name]: evt.target.value });
@@ -23,9 +23,9 @@ const CommentForm = (props) => {
 
 const handleSubmit = (evt) => {
   evt.preventDefault();
-  if (hootId && commentId) {
-    hootService.updateComment(hootId, commentId, formData);
-    navigate(`/hoots/${hootId}`);
+  if (gigId && commentId) {
+    gigService.updateComment(gigId, commentId, formData);
+    navigate(`/gigs/${gigId}`);
   } else {
     props.handleAddComment(formData);
   }

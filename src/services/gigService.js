@@ -1,4 +1,4 @@
-const BASE_URL = `${import.meta.env.VITE_BACK_END_SERVER_URL}/hoots`;
+const BASE_URL = `${import.meta.env.VITE_BACK_END_SERVER_URL}/gigs`;
 
 const index = async () => {
   try {
@@ -11,9 +11,9 @@ const index = async () => {
   }
 };
 
-const show = async (hootId) => {
+const show = async (gigId) => {
   try {
-    const res = await fetch(`${BASE_URL}/${hootId}`, {
+    const res = await fetch(`${BASE_URL}/${gigId}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     });
     return res.json();
@@ -22,7 +22,7 @@ const show = async (hootId) => {
   }
 };
 
-const create = async (hootFormData) => {
+const create = async (gigFormData) => {
   try {
     const res = await fetch(BASE_URL, {
       method: 'POST',
@@ -30,7 +30,7 @@ const create = async (hootFormData) => {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(hootFormData),
+      body: JSON.stringify(gigFormData),
     });
     return res.json();
   } catch (error) {
@@ -38,9 +38,9 @@ const create = async (hootFormData) => {
   }
 };
 
-const deleteHoot = async (hootId) => {
+const deleteGig = async (gigId) => {
   try {
-    const res = await fetch(`${BASE_URL}/${hootId}`, {
+    const res = await fetch(`${BASE_URL}/${gigId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -52,9 +52,9 @@ const deleteHoot = async (hootId) => {
   }
 };
 
-const createComment = async (hootId, commentFormData) => {
+const createComment = async (gigId, commentFormData) => {
   try {
-    const res = await fetch(`${BASE_URL}/${hootId}/comments`, {
+    const res = await fetch(`${BASE_URL}/${gigId}/comments`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -68,9 +68,9 @@ const createComment = async (hootId, commentFormData) => {
   }
 };
 
-const deleteComment = async (hootId, commentId) => {
+const deleteComment = async (gigId, commentId) => {
   try {
-    const res = await fetch(`${BASE_URL}/${hootId}/comments/${commentId}`, {
+    const res = await fetch(`${BASE_URL}/${gigId}/comments/${commentId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -82,15 +82,15 @@ const deleteComment = async (hootId, commentId) => {
   }
 };
 
-async function update(hootId, hootFormData) {
+async function update(gigId, gigFormData) {
   try {
-    const res = await fetch(`${BASE_URL}/${hootId}`, {
+    const res = await fetch(`${BASE_URL}/${gigId}`, {
       method: 'PUT',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(hootFormData),
+      body: JSON.stringify(gigFormData),
     });
     return res.json();
   } catch (error) {
@@ -98,9 +98,9 @@ async function update(hootId, hootFormData) {
   }
 }
 
-const updateComment = async (hootId, commentId, commentFormData) => {
+const updateComment = async (gigId, commentId, commentFormData) => {
   try {
-    const res = await fetch(`${BASE_URL}/${hootId}/comments/${commentId}`, {
+    const res = await fetch(`${BASE_URL}/${gigId}/comments/${commentId}`, {
       method: 'PUT',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -119,7 +119,7 @@ export {
     show,
     create,
     createComment,
-    deleteHoot,
+    deleteGig,
     update,
     deleteComment,
     updateComment,

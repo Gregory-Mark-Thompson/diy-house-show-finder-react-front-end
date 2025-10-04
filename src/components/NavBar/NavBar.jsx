@@ -17,8 +17,8 @@ const NavBar = () => {
         <ul>
           <li>Welcome, {user.username}</li>
           <li><Link to='/'>Home</Link></li>
-          <li><Link to='/hoots'>Hoots</Link></li>
-          <li><Link to='/hoots/new'>New Hoot</Link></li>
+          <li><Link to='/gigs'>Gigs</Link></li>
+          <li><Link to='/gigs/new'>New Gig</Link></li>
           <li><Link to='/' onClick={handleSignOut}>Sign Out</Link></li>
         </ul>
       ) : (

@@ -1,66 +1,66 @@
 import { useState, useEffect, useContext } from 'react';
-import * as hootService from '../../services/hootService';
+import * as gigService from '../../services/gigService';
 import { useParams, Link } from 'react-router';
 import CommentForm from '../CommentForm/CommentForm';
 import { UserContext } from '../../contexts/UserContext';
 
-const HootDetails = (props) => {
-  const { hootId } = useParams();
+const GigDetails = (props) => {
+  const { gigId } = useParams();
   const { user } = useContext(UserContext);
-  const [hoot, setHoot] = useState(null);
-  console.log('hootId', hootId);
+  const [gig, setGig] = useState(null);
+  console.log('gigId', gigId);
 
   useEffect(() => {
-    const fetchHoot = async () => {
-      const hootData = await hootService.show(hootId);
-      setHoot(hootData);
+    const fetchGig = async () => {
+      const gigData = await gigService.show(gigId);
+      setGig(gigData);
     };
-    fetchHoot();
-  }, [hootId]);
+    fetchGig();
+  }, [gigId]);
 
   const handleAddComment = async (commentFormData) => {
-    const newComment = await hootService.createComment(hootId, commentFormData);
-    setHoot({ ...hoot, comments: [...hoot.comments, newComment] });
+    const newComment = await gigService.createComment(gigId, commentFormData);
+    setGig({ ...gig, comments: [...gig.comments, newComment] });
   };
 
   const handleDeleteComment = async (commentId) => {
-    const deletedComment = await hootService.deleteComment(hootId, commentId);
-    setHoot({
-      ...hoot,
-      comments: hoot.comments.filter((comment) => comment._id !== commentId),
+    const deletedComment = await gigService.deleteComment(gigId, commentId);
+    setGig({
+      ...gig,
+      comments: gig.comments.filter((comment) => comment._id !== commentId),
     });
   };
 
 
-  console.log('hoot state:', hoot);
+  console.log('gig state:', gig);
 
-  if (!hoot) return <main>Loading...</main>;
+  if (!gig) return <main>Loading...</main>;
 
-  const visibleComments = hoot.comments.filter(
-    (comment) => user && (comment.author._id === user._id || hoot.author._id === user._id)
+  const visibleComments = gig.comments.filter(
+    (comment) => user && (comment.author._id === user._id || gig.author._id === user._id)
   );
 
   return (
     <main>
       <section>
         <header>
-          <p>{hoot.category.toUpperCase()}</p>
-          <h1>{hoot.title}</h1>
+          <p>{gig.category.toUpperCase()}</p>
+          <h1>{gig.title}</h1>
           <p>
-            {`${hoot.author.username} posted on
-            ${new Date(hoot.createdAt).toLocaleDateString()}`}
+            {`${gig.author.username} posted on
+            ${new Date(gig.createdAt).toLocaleDateString()}`}
           </p>
-            {hoot.author._id === user._id && (
+            {gig.author._id === user._id && (
               <>
-            <Link to={`/hoots/${hootId}/edit`}>Edit</Link>
-            <button onClick={() => props.handleDeleteHoot(hootId)}>
+            <Link to={`/gigs/${gigId}/edit`}>Edit</Link>
+            <button onClick={() => props.handleDeleteGig(gigId)}>
               Delete
             </button>
 
               </>
             )}
         </header>
-        <p>{hoot.text}</p>
+        <p>{gig.text}</p>
       </section>
       <section>
         <h2>Comments</h2>
@@ -75,7 +75,7 @@ const HootDetails = (props) => {
                     </p>
         {comment.author._id === user._id && (
           <>
-            <Link to={`/hoots/${hootId}/comments/${comment._id}/edit`}>Edit</Link>
+            <Link to={`/gigs/${gigId}/comments/${comment._id}/edit`}>Edit</Link>
 
             <button onClick={() => handleDeleteComment(comment._id)}>
               Delete
@@ -91,4 +91,4 @@ const HootDetails = (props) => {
   );
 }
 
-export default HootDetails;
+export default GigDetails;

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
-import * as hootService from '../../services/hootService';
+import * as gigService from '../../services/gigService';
 
-const HootForm = (props) => {
-  const { hootId } = useParams();
+const GigForm = (props) => {
+  const { gigId } = useParams();
   const [formData, setFormData] = useState({
     title: '',
     text: '',
@@ -11,13 +11,13 @@ const HootForm = (props) => {
   });
 
   useEffect(() => {
-    const fetchHoot = async () => {
-      const hootData = await hootService.show(hootId);
-      setFormData(hootData);
+    const fetchGig = async () => {
+      const gigData = await gigService.show(gigId);
+      setFormData(gigData);
     };
-    if (hootId) fetchHoot();
+    if (gigId) fetchGig();
     return () => setFormData({ title: '', text: '', category: 'News' });
-  }, [hootId]);
+  }, [gigId]);
 
 
   const handleChange = (evt) => {
@@ -26,16 +26,16 @@ const HootForm = (props) => {
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
-    if (hootId) {
-      props.handleUpdateHoot(hootId, formData);
+    if (gigId) {
+      props.handleUpdateGig(gigId, formData);
     } else {
-      props.handleAddHoot(formData);
+      props.handleAddGig(formData);
     }
   };
 
   return (
     <main>
-      <h1>{hootId ? 'Edit Hoot' : 'New Hoot'}</h1>
+      <h1>{gigId ? 'Edit Gig' : 'New Gig'}</h1>
       <form onSubmit={handleSubmit}>
         <label htmlFor='title-input'>Title</label>
         <input
@@ -63,12 +63,14 @@ const HootForm = (props) => {
           value={formData.category}
           onChange={handleChange}
         >
-          <option value='News'>News</option>
-          <option value='Games'>Games</option>
-          <option value='Music'>Music</option>
-          <option value='Movies'>Movies</option>
-          <option value='Sports'>Sports</option>
-          <option value='Television'>Television</option>
+          <option value='Rock'>Rock</option>
+          <option value='Metal'>Metal</option>
+          <option value='Punk'>Punk</option>
+          <option value='R&B'>R&B</option>
+          <option value='Rapp'>Rapp</option>
+          <option value='Techno/Elctronic'>Techno/Elctronic</option>
+          <option value='Country'>Country</option>
+          <option value='Folk/World'>Folk/World</option>
         </select>
         <button type='submit'>SUBMIT</button>
       </form>
@@ -76,4 +78,4 @@ const HootForm = (props) => {
   );
 };
 
-export default HootForm;
+export default GigForm;
