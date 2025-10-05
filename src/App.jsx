@@ -101,7 +101,7 @@ const handleUpdateGig = async (gigId, gigFormData) => {
             />
             <Route 
               path='/bands/:bandId'
-              element={<BandDetails handleDeleteGig={handleDeleteBand}/>}
+              element={<BandDetails handleDeleteBand={handleDeleteBand}/>}
             />
             <Route 
               path='/gigs/:gigId'
