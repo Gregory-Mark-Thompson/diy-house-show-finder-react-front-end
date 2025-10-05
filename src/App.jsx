@@ -87,6 +87,7 @@ const handleUpdateGig = async (gigId, gigFormData) => {
       <Routes>
         <Route path='/' element={user ? <Dashboard /> : <Landing />} />
         <Route path="/bands" element={<BandList bands={bands} user={user} />} />
+
         {user ? (
           <>
             {/* Protected routes (available only to signed-in users) */}
@@ -123,6 +124,7 @@ const handleUpdateGig = async (gigId, gigFormData) => {
         ) : (
           <>
             {/* Non-user routes (available only to guests) */}
+            <Route path="/bands/:id" element={<BandDetails bands={bands} user={user} />} />
             <Route path='/sign-up' element={<SignUpForm />} />
             <Route path='/sign-in' element={<SignInForm />} />
           </>
