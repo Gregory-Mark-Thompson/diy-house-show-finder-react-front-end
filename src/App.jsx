@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';  // <-- v6 imports (no Router/Route/hashHistory)
-
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import * as authService from './services/authService';
 import NavBar from './components/NavBar/NavBar';
 import SignUpForm from './components/SignUpForm/SignUpForm';
 import SignInForm from './components/SignInForm/SignInForm';
@@ -18,65 +18,155 @@ import BandForm from './components/BandForm/BandForm';
 import BandList from './components/BandList/BandList';
 
 const App = () => {
-  const navigate = useNavigate();  // <-- v6 hook for navigation (replaces hashHistory.push)
+  const navigate = useNavigate();
   const [gigs, setGigs] = useState([]);
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const [bands, setBands] = useState([]);
+  
+useEffect(() => {
+  let isMounted = true;
+  const validateToken = async () => {
+    const token = localStorage.getItem('token');
+    if (token && isMounted) {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_BACK_END_SERVER_URL}/test-jwt/verify-token`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          throw new Error(errorData.err || `Token validation failed: ${res.status}`);
+        }
+        const data = await res.json();
+        if (isMounted) setUser(data.decoded.payload);
+      } catch (error) {
+        console.error('Token validation failed:', error.message);
+        if (isMounted) {
+          localStorage.removeItem('token');
+          setUser(null);
+          if (window.location.pathname !== '/sign-in') {
+            navigate('/sign-in');
+          }
+        }
+      }
+    }
+  };
+  validateToken();
+  return () => { isMounted = false; }; // Cleanup
+}, [setUser]);
 
   const handleAddGig = async (gigFormData) => {
-    const newGig = await gigService.create(gigFormData);
-    setGigs([newGig, ...gigs]);
-    navigate('/gigs');
+    try {
+      const newGig = await gigService.create(gigFormData);
+      setGigs([newGig, ...gigs]);
+      navigate('/gigs');
+    } catch (error) {
+      console.error('Error adding gig:', error);
+      throw error; // Handle in GigForm
+    }
   };
 
   const handleDeleteGig = async (gigId) => {
-    await gigService.deleteGig(gigId);
-    setGigs(gigs.filter((gig) => gig._id !== gigId));
-    navigate('/gigs');
+    try {
+      await gigService.deleteGig(gigId);
+      setGigs(gigs.filter((gig) => gig._id !== gigId));
+      navigate('/gigs');
+    } catch (error) {
+      console.error('Error deleting gig:', error);
+    }
   };
 
   const handleUpdateGig = async (gigId, gigFormData) => {
-    const updatedGig = await gigService.update(gigId, gigFormData);
-    setGigs(gigs.map((gig) => (gig._id === gigId ? updatedGig : gig)));
-    navigate(`/gigs/${gigId}`);
+    try {
+      const updatedGig = await gigService.update(gigId, gigFormData);
+      setGigs(gigs.map((gig) => (gig._id === gigId ? updatedGig : gig)));
+      navigate(`/gigs/${gigId}`);
+    } catch (error) {
+      console.error('Error updating gig:', error);
+      throw error; // Handle in GigForm
+    }
+  };
+
+  const handleAddComment = async (gigId, commentFormData) => {
+    try {
+      const newComment = await gigService.createComment(gigId, commentFormData);
+      // Optionally update gigs state if comments are still embedded (not needed with separate Comment model)
+      return newComment;
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      throw error; // Handle in CommentForm
+    }
+  };
+
+  const handleUpdateComment = async (gigId, commentId, commentFormData) => {
+    try {
+      const updatedComment = await gigService.updateComment(gigId, commentId, commentFormData);
+      return updatedComment;
+    } catch (error) {
+      console.error('Error updating comment:', error);
+      throw error; // Handle in CommentForm
+    }
+  };
+
+  const handleAddBand = async (bandFormData) => {
+    try {
+      const newBand = await bandService.createBand(bandFormData);
+      setBands([newBand, ...bands]);
+      navigate('/bands');
+    } catch (error) {
+      console.error('Error adding band:', error);
+      throw error; // Handle in BandForm
+    }
+  };
+
+  const handleDeleteBand = async (bandId) => {
+    try {
+      await bandService.deleteBand(bandId);
+      setBands(bands.filter((band) => band._id !== bandId));
+      navigate('/bands');
+    } catch (error) {
+      console.error('Error deleting band:', error);
+    }
+  };
+
+  const handleUpdateBand = async (bandId, bandFormData) => {
+    try {
+      const updatedBand = await bandService.updateBand(bandId, bandFormData);
+      setBands(bands.map((band) => (band._id === bandId ? updatedBand : band)));
+      navigate(`/bands/${bandId}`);
+    } catch (error) {
+      console.error('Error updating band:', error);
+      throw error; // Handle in BandForm
+    }
   };
 
   useEffect(() => {
     const fetchAll = async () => {
       if (user) {
-        const [gigsData, bandsData] = await Promise.all([
-          gigService.index(),
-          bandService.indexBand(),
-        ]);
-        setGigs(gigsData);
-        setBands(bandsData);
+        try {
+          const [gigsData, bandsData] = await Promise.all([
+            gigService.index(),
+            bandService.indexBand(),
+          ]);
+          setGigs(Array.isArray(gigsData) ? gigsData : []);
+          setBands(Array.isArray(bandsData) ? bandsData : []);
+        } catch (error) {
+          console.error('Error fetching data:', error);
+          setGigs([]);
+          setBands([]);
+        }
       }
     };
     fetchAll();
   }, [user]);
 
-  const handleAddBand = async (bandFormData) => {
-    const newBand = await bandService.createBand(bandFormData);
-    setBands([newBand, ...bands]);
-    navigate('/bands');
-  };
-
-  const handleDeleteBand = async (bandId) => {
-    await bandService.deleteBand(bandId);
-    setBands(bands.filter((band) => band._id !== bandId));
-    navigate('/bands');
-  };
-
-  const handleUpdateBand = async (bandId, bandFormData) => {
-    const updatedBand = await bandService.updateBand(bandId, bandFormData);
-    setBands(bands.map((band) => (band._id === bandId ? updatedBand : band)));
-    navigate(`/bands/${bandId}`);
-  };
-
-  return (
+return (
     <>
       <NavBar />
-      <Routes>  {/* <-- v6 Routes wrapper */}
+      <Routes>
         <Route path="/" element={user ? <Dashboard /> : <Landing />} />
         <Route path="/bands" element={<BandList bands={bands} />} />
         <Route
@@ -94,11 +184,7 @@ const App = () => {
             <Route path="/bands/new" element={<BandForm handleAddBand={handleAddBand} />} />
             <Route
               path="/bands/:bandId/edit"
-              element={
-                <BandForm
-                  handleUpdateBand={handleUpdateBand}
-                />
-              }
+              element={<BandForm handleUpdateBand={handleUpdateBand} />}
             />
             <Route path="/gigs/:gigId" element={<GigDetails handleDeleteGig={handleDeleteGig} />} />
             <Route path="/gigs/new" element={<GigForm handleAddGig={handleAddGig} />} />
@@ -108,7 +194,11 @@ const App = () => {
             />
             <Route
               path="/gigs/:gigId/comments/:commentId/edit"
-              element={<CommentForm />}
+              element={<CommentForm handleUpdateComment={handleUpdateComment} />}
+            />
+            <Route
+              path="/gigs/:gigId/comments/new"
+              element={<CommentForm handleAddComment={handleAddComment} />}
             />
           </>
         ) : (
@@ -117,6 +207,7 @@ const App = () => {
             <Route path="/sign-in" element={<SignInForm />} />
           </>
         )}
+        <Route path="*" element={<h1>404: Page Not Found</h1>} />
       </Routes>
     </>
   );
