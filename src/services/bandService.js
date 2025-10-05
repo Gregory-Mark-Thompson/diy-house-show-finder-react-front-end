@@ -17,11 +17,7 @@ const indexBand = async () => {
 
 const showBand = async (bandId) => {
   try {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('No token found. Please log in.');
-    const res = await fetch(`${BASE_URL}/${bandId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await fetch(`${BASE_URL}/${bandId}`);
     if (!res.ok) throw new Error(`Failed to fetch band: ${res.status}`);
     return res.json();
   } catch (error) {

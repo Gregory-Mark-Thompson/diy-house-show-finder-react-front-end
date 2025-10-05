@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from 'react';
-import { Routes, Route, useNavigate } from 'react-router';
+import { Routes, Route, useNavigate } from 'react-router-dom';  // <-- v6 imports (no Router/Route/hashHistory)
 
 import NavBar from './components/NavBar/NavBar';
 import SignUpForm from './components/SignUpForm/SignUpForm';
@@ -18,37 +18,41 @@ import BandForm from './components/BandForm/BandForm';
 import BandList from './components/BandList/BandList';
 
 const App = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate();  // <-- v6 hook for navigation (replaces hashHistory.push)
   const [gigs, setGigs] = useState([]);
   const { user } = useContext(UserContext);
   const [bands, setBands] = useState([]);
-  
+
   const handleAddGig = async (gigFormData) => {
     const newGig = await gigService.create(gigFormData);
     setGigs([newGig, ...gigs]);
     navigate('/gigs');
   };
 
-const handleDeleteGig = async (gigId) => {
-  const deletedGig = await gigService.deleteGig(gigId);
-  setGigs(gigs.filter((gig) => gig._id !== gigId));
-  navigate('/gigs');
-};
+  const handleDeleteGig = async (gigId) => {
+    await gigService.deleteGig(gigId);
+    setGigs(gigs.filter((gig) => gig._id !== gigId));
+    navigate('/gigs');
+  };
 
-const handleUpdateGig = async (gigId, gigFormData) => {
-  const updatedGig = await gigService.update(gigId, gigFormData);
-  setGigs(gigs.map((gig) => (gigId === gig._id ? updatedGig : gig)));
-  navigate(`/gigs/${gigId}`);
-};
+  const handleUpdateGig = async (gigId, gigFormData) => {
+    const updatedGig = await gigService.update(gigId, gigFormData);
+    setGigs(gigs.map((gig) => (gig._id === gigId ? updatedGig : gig)));
+    navigate(`/gigs/${gigId}`);
+  };
 
   useEffect(() => {
-    const fetchAllGigs = async () => {
-      const gigsData = await gigService.index();
-  
-      // console log to verify
-      setGigs(gigsData);
+    const fetchAll = async () => {
+      if (user) {
+        const [gigsData, bandsData] = await Promise.all([
+          gigService.index(),
+          bandService.indexBand(),
+        ]);
+        setGigs(gigsData);
+        setBands(bandsData);
+      }
     };
-    if (user) fetchAllGigs();
+    fetchAll();
   }, [user]);
 
   const handleAddBand = async (bandFormData) => {
@@ -58,80 +62,64 @@ const handleUpdateGig = async (gigId, gigFormData) => {
   };
 
   const handleDeleteBand = async (bandId) => {
-    const deletedBand = await bandService.deleteBand(bandId);
+    await bandService.deleteBand(bandId);
     setBands(bands.filter((band) => band._id !== bandId));
     navigate('/bands');
   };
 
   const handleUpdateBand = async (bandId, bandFormData) => {
     const updatedBand = await bandService.updateBand(bandId, bandFormData);
-    setBands(bands.map((band) => (bandId === band._id ? updatedBand : band)));
+    setBands(bands.map((band) => (band._id === bandId ? updatedBand : band)));
     navigate(`/bands/${bandId}`);
   };
 
-    useEffect(() => {
-    const fetchAllBands = async () => {
-      const bandsData = await bandService.indexBand();
-  
-      // console log to verify
-      setBands(bandsData);
-    };
-    if (user) fetchAllBands();
-  }, [user]);
-  // return statement code here
-
-  
   return (
     <>
-      <NavBar/>
-      <Routes>
-        <Route path='/' element={user ? <Dashboard /> : <Landing />} />
-        <Route path="/bands" element={<BandList bands={bands} user={user} />} />
-
+      <NavBar />
+      <Routes>  {/* <-- v6 Routes wrapper */}
+        <Route path="/" element={user ? <Dashboard /> : <Landing />} />
+        <Route path="/bands" element={<BandList bands={bands} />} />
+        <Route
+          path="/bands/:bandId"
+          element={
+            <BandDetails
+              handleDeleteBand={handleDeleteBand}
+              user={user}
+            />
+          }
+        />
         {user ? (
           <>
-            {/* Protected routes (available only to signed-in users) */}
-            <Route path='/gigs' element={<GigList gigs={gigs} />} />
-            <Route 
-              path='/bands/new' 
-              element={<BandForm handleAddBand={handleAddBand} />}
+            <Route path="/gigs" element={<GigList gigs={gigs} />} />
+            <Route path="/bands/new" element={<BandForm handleAddBand={handleAddBand} />} />
+            <Route
+              path="/bands/:bandId/edit"
+              element={
+                <BandForm
+                  handleUpdateBand={handleUpdateBand}
+                />
+              }
+            />
+            <Route path="/gigs/:gigId" element={<GigDetails handleDeleteGig={handleDeleteGig} />} />
+            <Route path="/gigs/new" element={<GigForm handleAddGig={handleAddGig} />} />
+            <Route
+              path="/gigs/:gigId/edit"
+              element={<GigForm handleUpdateGig={handleUpdateGig} />}
             />
             <Route
-              path='/bands/:bandId/edit'
-              element={<GigForm handleUpdateBand={handleUpdateBand}/>}
-            />
-            <Route 
-              path='/bands/:bandId'
-              element={<BandDetails handleDeleteBand={handleDeleteBand}/>}
-            />
-            <Route 
-              path='/gigs/:gigId'
-              element={<GigDetails handleDeleteGig={handleDeleteGig}/>}
-            />
-            <Route 
-              path='/gigs/new' 
-              element={<GigForm handleAddGig={handleAddGig} />}
-            />
-            <Route
-              path='/gigs/:gigId/edit'
-              element={<GigForm handleUpdateGig={handleUpdateGig}/>}
-            />
-            <Route
-              path='/gigs/:gigId/comments/:commentId/edit'
+              path="/gigs/:gigId/comments/:commentId/edit"
               element={<CommentForm />}
             />
           </>
         ) : (
           <>
-            {/* Non-user routes (available only to guests) */}
-            <Route path="/bands/:id" element={<BandDetails bands={bands} user={user} />} />
-            <Route path='/sign-up' element={<SignUpForm />} />
-            <Route path='/sign-in' element={<SignInForm />} />
+            <Route path="/sign-up" element={<SignUpForm />} />
+            <Route path="/sign-in" element={<SignInForm />} />
           </>
         )}
       </Routes>
     </>
   );
-}
+};
 
 export default App;

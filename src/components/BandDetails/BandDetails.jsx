@@ -1,27 +1,37 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router';
+import { useParams } from 'react-router-dom';
 import * as bandService from '../../services/bandService';
 
-const BandDetails = (props) => {
+const BandDetails = ({ handleDeleteBand, user }) => {
   const { bandId } = useParams();
   const [band, setBand] = useState(null);
-  console.log('bandId', bandId);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchBand = async () => {
+      if (!bandId || bandId === 'undefined') {
+        setError('Band ID is missing or undefined');
+        return;
+      }
       try {
-        const bandData = await bandService.showBand(bandId); // Fixed: showBand, not show
+        console.log('Fetching band with ID:', bandId);
+        const bandData = await bandService.showBand(bandId);
+        console.log('Band data received:', bandData);
         setBand(bandData);
+        setError(null);
       } catch (error) {
-        console.error('Error fetching band:', error);
-        setBand(null);
+        console.error('Error fetching band:', error.message, error.stack);
+        setError(error.message || 'Failed to load band details');
       }
     };
     fetchBand();
   }, [bandId]);
 
+  console.log('bandId:', bandId);
   console.log('band state:', band);
+  console.log('error state:', error);
 
+  if (error) return <main>Error: {error}</main>;
   if (!band) return <main>Loading...</main>;
 
   return (
@@ -35,10 +45,8 @@ const BandDetails = (props) => {
               ? `${band.author.username} posted on ${new Date(band.createdAt || Date.now()).toLocaleDateString()}`
               : `Posted on ${new Date(band.createdAt || Date.now()).toLocaleDateString()}`}
           </p>
-          {band.author && band.author._id && (
-            <button onClick={() => props.handleDeleteBand(bandId)}>
-              Delete
-            </button>
+          {band.author && band.author._id === user?._id && handleDeleteBand && (
+            <button onClick={() => handleDeleteBand(bandId)}>Delete</button>
           )}
         </header>
         <p>{band.text || 'No description'}</p>
