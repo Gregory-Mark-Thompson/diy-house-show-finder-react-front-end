@@ -68,7 +68,7 @@ const BandForm = (props) => {
           <option value='Punk'>Punk</option>
           <option value='R&B'>R&B</option>
           <option value='Rapp'>Rapp</option>
-          <option value='Techno/Elctronic'>Techno/Elctronic</option>
+          <option value='Techno/Electronic'>Techno/Electronic</option>
           <option value='Country'>Country</option>
           <option value='Folk/World'>Folk/World</option>
         </select>
