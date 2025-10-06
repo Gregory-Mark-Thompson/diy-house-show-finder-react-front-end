@@ -11,6 +11,7 @@ const CommentForm = ({ handleAddComment, handleUpdateComment }) => {
   const parent = location.state?.parent || null;
 
   useEffect(() => {
+    console.log('CommentForm params:', { gigId, commentId, parent });
     if (commentId) {
       const fetchComment = async () => {
         try {
@@ -32,21 +33,31 @@ const CommentForm = ({ handleAddComment, handleUpdateComment }) => {
 
   const handleChange = (evt) => {
     setFormData({ ...formData, [evt.target.name]: evt.target.value });
-    setError(null); // Clear error on input change
+    setError(null);
   };
 
   const handleSubmit = async (evt) => {
     evt.preventDefault();
     try {
+      if (!formData.text.trim()) {
+        setError('Comment text cannot be empty');
+        return;
+      }
+      const commentData = { text: formData.text.trim(), parent };
+      console.log('Submitting comment:', {
+        gigId: String(gigId),
+        commentData,
+        serialized: JSON.stringify(commentData)
+      });
       if (commentId) {
-        await handleUpdateComment(gigId, commentId, formData);
+        await handleUpdateComment(String(gigId), commentId, commentData);
       } else {
-        await handleAddComment(gigId, { ...formData, parent });
+        await handleAddComment(commentData, String(gigId)); // Fix: Swap arguments to match App.jsx
       }
       navigate(`/gigs/${gigId}`);
     } catch (error) {
       setError(error.message || 'Failed to submit comment');
-      console.error('Comment submit error:', error);
+      console.error('Comment submit error:', error.message, error);
     }
   };
 

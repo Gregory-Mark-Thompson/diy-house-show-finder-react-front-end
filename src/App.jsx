@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import * as authService from './services/authService';
+
 import NavBar from './components/NavBar/NavBar';
 import SignUpForm from './components/SignUpForm/SignUpForm';
 import SignInForm from './components/SignInForm/SignInForm';
@@ -90,16 +90,16 @@ useEffect(() => {
     }
   };
 
-  const handleAddComment = async (gigId, commentFormData) => {
-    try {
-      const newComment = await gigService.createComment(gigId, commentFormData);
-      // Optionally update gigs state if comments are still embedded (not needed with separate Comment model)
-      return newComment;
-    } catch (error) {
-      console.error('Error adding comment:', error);
-      throw error; // Handle in CommentForm
-    }
-  };
+const handleAddComment = async (commentFormData, gigId) => {
+  try {
+    console.log('App handleAddComment:', { gigId, commentFormData });
+    const newComment = await gigService.createComment(gigId, commentFormData);
+    return newComment;
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    throw error;
+  }
+};
 
   const handleUpdateComment = async (gigId, commentId, commentFormData) => {
     try {

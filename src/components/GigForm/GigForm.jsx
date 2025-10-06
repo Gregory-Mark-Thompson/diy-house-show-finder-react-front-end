@@ -7,7 +7,7 @@ const GigForm = (props) => {
   const [formData, setFormData] = useState({
     title: '',
     text: '',
-    category: 'News',
+    category: 'Rock',
   });
 
   useEffect(() => {
@@ -16,9 +16,8 @@ const GigForm = (props) => {
       setFormData(gigData);
     };
     if (gigId) fetchGig();
-    return () => setFormData({ title: '', text: '', category: 'News' });
+    return () => setFormData({ title: '', text: '', category: 'Rock' });
   }, [gigId]);
-
 
   const handleChange = (evt) => {
     setFormData({ ...formData, [evt.target.name]: evt.target.value });
@@ -49,7 +48,6 @@ const GigForm = (props) => {
         <label htmlFor='text-input'>Text</label>
         <textarea
           required
-          type='text'
           name='text'
           id='text-input'
           value={formData.text}

@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import * as gigService from '../../services/gigService';
 import { useParams, Link } from 'react-router-dom';
 import CommentForm from '../CommentForm/CommentForm';
-import Comment from '../Comment/Comment'; // Assuming you rename your Comment component file
+import Comment from '../Comment/Comment';
 import { UserContext } from '../../contexts/UserContext';
 
 const GigDetails = ({ handleDeleteGig }) => {
@@ -12,25 +12,40 @@ const GigDetails = ({ handleDeleteGig }) => {
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
+    console.log('GigDetails gigId:', gigId);
     const fetchData = async () => {
-      const [gigData, commentsData] = await Promise.all([
-        gigService.show(gigId),
-        gigService.indexComments(gigId),
-      ]);
-      setGig(gigData);
-      setComments(commentsData);
+      try {
+        const [gigData, commentsData] = await Promise.all([
+          gigService.show(gigId),
+          gigService.indexComments(gigId),
+        ]);
+        setGig(gigData);
+        setComments(commentsData);
+      } catch (error) {
+        console.error('GigDetails fetch error:', error);
+      }
     };
     fetchData();
   }, [gigId]);
 
-  const handleAddComment = async (commentFormData) => {
-    const newComment = await gigService.createComment(gigId, commentFormData);
-    setComments([...comments, newComment]); // Optimistic, or refetch
-  };
+const handleAddComment = async (commentFormData, gigIdFromForm) => {
+  console.log('handleAddComment:', {
+    gigId: String(gigId),
+    gigIdFromForm,
+    commentFormData,
+    serialized: JSON.stringify(commentFormData)
+  });
+  if (gigIdFromForm !== gigId) {
+    console.error('Gig ID mismatch:', { gigId, gigIdFromForm });
+    throw new Error('Gig ID mismatch');
+  }
+  await gigService.createComment(String(gigId), commentFormData);
+  const updatedComments = await gigService.indexComments(String(gigId));
+  setComments(updatedComments);
+};
 
   const handleDeleteComment = async (commentId) => {
     await gigService.deleteComment(gigId, commentId);
-    // Refetch comments to reflect changes
     const updatedComments = await gigService.indexComments(gigId);
     setComments(updatedComments);
   };
@@ -59,7 +74,7 @@ const GigDetails = ({ handleDeleteGig }) => {
       </section>
       <section>
         <h2>Comments</h2>
-        <CommentForm handleAddComment={handleAddComment} /> {/* Top-level form */}
+        <CommentForm handleAddComment={handleAddComment} />
         {!comments.length && <p>No comments yet.</p>}
         {comments.map((comment) => (
           <Comment

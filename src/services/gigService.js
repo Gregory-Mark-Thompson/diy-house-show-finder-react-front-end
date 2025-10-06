@@ -56,7 +56,20 @@ const createComment = async (gigId, commentFormData) => {
   try {
     const token = localStorage.getItem('token');
     if (!token) throw new Error('No token found. Please log in.');
-    if (typeof gigId !== 'string') throw new Error('Invalid gigId');
+    if (typeof gigId !== 'string' || !gigId.match(/^[0-9a-fA-F]{24}$/)) {
+      console.error('Invalid gigId:', gigId);
+      throw new Error('Invalid gigId format');
+    }
+    if (!commentFormData.text || typeof commentFormData.text !== 'string') {
+      console.error('Invalid commentFormData:', commentFormData);
+      throw new Error('Comment text is required');
+    }
+    console.log('createComment payload:', {
+      gigId,
+      commentFormData,
+      body: JSON.stringify(commentFormData),
+      url: `${BASE_URL}/${gigId}/comments`
+    });
     const res = await fetch(`${BASE_URL}/${gigId}/comments`, {
       method: 'POST',
       headers: {
@@ -67,11 +80,12 @@ const createComment = async (gigId, commentFormData) => {
     });
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}));
+      console.error('createComment response error:', errorData, res.status);
       throw new Error(errorData.error || `Failed to create comment: ${res.status}`);
     }
     return res.json();
   } catch (error) {
-    console.error('createComment error:', error.message);
+    console.error('createComment error:', error.message, error);
     throw error;
   }
 };
