@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-
+import './App.css';
 import NavBar from './components/NavBar/NavBar';
 import SignUpForm from './components/SignUpForm/SignUpForm';
 import SignInForm from './components/SignInForm/SignInForm';
@@ -23,40 +23,40 @@ const App = () => {
   const { user, setUser } = useContext(UserContext);
   const [bands, setBands] = useState([]);
   
-useEffect(() => {
-  let isMounted = true;
-  const validateToken = async () => {
-    const token = localStorage.getItem('token');
-    if (token && isMounted) {
-      try {
-        const res = await fetch(`${import.meta.env.VITE_BACK_END_SERVER_URL}/test-jwt/verify-token`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        if (!res.ok) {
-          const errorData = await res.json().catch(() => ({}));
-          throw new Error(errorData.err || `Token validation failed: ${res.status}`);
-        }
-        const data = await res.json();
-        if (isMounted) setUser(data.decoded.payload);
-      } catch (error) {
-        console.error('Token validation failed:', error.message);
-        if (isMounted) {
-          localStorage.removeItem('token');
-          setUser(null);
-          if (window.location.pathname !== '/sign-in') {
-            navigate('/sign-in');
+  useEffect(() => {
+    let isMounted = true;
+    const validateToken = async () => {
+      const token = localStorage.getItem('token');
+      if (token && isMounted) {
+        try {
+          const res = await fetch(`${import.meta.env.VITE_BACK_END_SERVER_URL}/test-jwt/verify-token`, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            throw new Error(errorData.err || `Token validation failed: ${res.status}`);
+          }
+          const data = await res.json();
+          if (isMounted) setUser(data.decoded.payload);
+        } catch (error) {
+          console.error('Token validation failed:', error.message);
+          if (isMounted) {
+            localStorage.removeItem('token');
+            setUser(null);
+            if (window.location.pathname !== '/sign-in') {
+              navigate('/sign-in');
+            }
           }
         }
       }
-    }
-  };
-  validateToken();
-  return () => { isMounted = false; }; // Cleanup
-}, [setUser]);
+    };
+    validateToken();
+    return () => { isMounted = false; };
+  }, [setUser]);
 
   const handleAddGig = async (gigFormData) => {
     try {
@@ -65,7 +65,7 @@ useEffect(() => {
       navigate('/gigs');
     } catch (error) {
       console.error('Error adding gig:', error);
-      throw error; // Handle in GigForm
+      throw error;
     }
   };
 
@@ -86,20 +86,20 @@ useEffect(() => {
       navigate(`/gigs/${gigId}`);
     } catch (error) {
       console.error('Error updating gig:', error);
-      throw error; // Handle in GigForm
+      throw error;
     }
   };
 
-const handleAddComment = async (commentFormData, gigId) => {
-  try {
-    console.log('App handleAddComment:', { gigId, commentFormData });
-    const newComment = await gigService.createComment(gigId, commentFormData);
-    return newComment;
-  } catch (error) {
-    console.error('Error adding comment:', error);
-    throw error;
-  }
-};
+  const handleAddComment = async (commentFormData, gigId) => {
+    try {
+      console.log('App handleAddComment:', { gigId, commentFormData });
+      const newComment = await gigService.createComment(gigId, commentFormData);
+      return newComment;
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      throw error;
+    }
+  };
 
   const handleUpdateComment = async (gigId, commentId, commentFormData) => {
     try {
@@ -107,7 +107,7 @@ const handleAddComment = async (commentFormData, gigId) => {
       return updatedComment;
     } catch (error) {
       console.error('Error updating comment:', error);
-      throw error; // Handle in CommentForm
+      throw error;
     }
   };
 
@@ -118,7 +118,7 @@ const handleAddComment = async (commentFormData, gigId) => {
       navigate('/bands');
     } catch (error) {
       console.error('Error adding band:', error);
-      throw error; // Handle in BandForm
+      throw error;
     }
   };
 
@@ -139,31 +139,39 @@ const handleAddComment = async (commentFormData, gigId) => {
       navigate(`/bands/${bandId}`);
     } catch (error) {
       console.error('Error updating band:', error);
-      throw error; // Handle in BandForm
+      throw error;
     }
   };
 
   useEffect(() => {
-    const fetchAll = async () => {
+    const fetchBands = async () => {
+      try {
+        const bandsData = await bandService.indexBand();
+        setBands(Array.isArray(bandsData) ? bandsData : []);
+      } catch (error) {
+        console.error('Error fetching bands:', error);
+        setBands([]);
+      }
+    };
+    fetchBands();
+  }, []);
+
+  useEffect(() => {
+    const fetchGigs = async () => {
       if (user) {
         try {
-          const [gigsData, bandsData] = await Promise.all([
-            gigService.index(),
-            bandService.indexBand(),
-          ]);
+          const gigsData = await gigService.index();
           setGigs(Array.isArray(gigsData) ? gigsData : []);
-          setBands(Array.isArray(bandsData) ? bandsData : []);
         } catch (error) {
-          console.error('Error fetching data:', error);
+          console.error('Error fetching gigs:', error);
           setGigs([]);
-          setBands([]);
         }
       }
     };
-    fetchAll();
+    fetchGigs();
   }, [user]);
 
-return (
+  return (
     <>
       <NavBar />
       <Routes>

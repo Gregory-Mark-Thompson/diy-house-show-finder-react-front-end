@@ -3,9 +3,9 @@ const BASE_URL = `${import.meta.env.VITE_BACK_END_SERVER_URL}/bands`;
 const indexBand = async () => {
   try {
     const token = localStorage.getItem('token');
-    if (!token) throw new Error('No token found. Please log in.');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
     const res = await fetch(BASE_URL, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers,
     });
     if (!res.ok) throw new Error(`Failed to fetch bands: ${res.status}`);
     return res.json();
@@ -17,7 +17,11 @@ const indexBand = async () => {
 
 const showBand = async (bandId) => {
   try {
-    const res = await fetch(`${BASE_URL}/${bandId}`);
+    const token = localStorage.getItem('token');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    const res = await fetch(`${BASE_URL}/${bandId}`, {
+      headers,
+    });
     if (!res.ok) throw new Error(`Failed to fetch band: ${res.status}`);
     return res.json();
   } catch (error) {

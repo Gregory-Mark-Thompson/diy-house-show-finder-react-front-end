@@ -7,7 +7,7 @@ const BandList = (props) => {
         props.bands.map((band) => (
           band && band._id ? (
             <Link key={band._id} to={`/bands/${band._id}`}>
-              <article>
+              <article className="bandList">
                 <header>
                   <h2>{band.title || 'Untitled'}</h2>
                   <p>

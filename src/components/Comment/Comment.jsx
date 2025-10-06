@@ -9,7 +9,7 @@ const Comment = ({ comment, gigId, user, gig, handleDeleteComment }) => {
   };
 
   return (
-    <article key={comment._id}>
+    <article className='commentClass' key={comment._id}>
       <header>
         <p>
           {comment.author?.username

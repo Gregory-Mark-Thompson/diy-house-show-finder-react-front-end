@@ -6,7 +6,7 @@ const GigList = ({ gigs }) => {
       {gigs && Array.isArray(gigs) && gigs.length > 0 ? (
         gigs.map((gig) => (
           <Link key={gig._id} to={`/gigs/${gig._id}`}>
-            <article>
+            <article className="gigList">
               <header>
                 <h2>{gig.title || 'Untitled'}</h2>
                 <p>

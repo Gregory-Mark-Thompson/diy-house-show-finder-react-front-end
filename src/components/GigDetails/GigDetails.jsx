@@ -54,7 +54,7 @@ const handleAddComment = async (commentFormData, gigIdFromForm) => {
 
   return (
     <main>
-      <section>
+      <section className="gigClass">
         <header>
           <p>{gig.category?.toUpperCase() || 'N/A'}</p>
           <h1>{gig.title || 'Untitled'}</h1>

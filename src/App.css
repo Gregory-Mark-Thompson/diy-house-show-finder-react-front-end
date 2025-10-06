@@ -1,0 +1,32 @@
+.commentClass {
+    border: 5px solid cornflowerblue;
+    margin: 10px;
+    padding: 7px;
+    color: rgb(255, 0, 238);
+}
+
+.gigClass {
+    border: 10px solid royalblue;
+    margin: 10px;
+    padding: 7px;
+    color:blueviolet;
+}
+
+.gigList {
+    border: 5px solid royalblue;
+    margin: 10px;
+    padding: 7px;
+}
+
+.bandClass {
+    border: 10px solid royalblue;
+    margin: 10px;
+    padding: 7px;
+    color:blueviolet;
+}
+
+.bandList {
+    border: 5px solid royalblue;
+    margin: 10px;
+    padding: 7px;
+}

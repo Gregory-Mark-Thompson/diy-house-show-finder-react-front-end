@@ -36,7 +36,7 @@ const BandDetails = ({ handleDeleteBand, user }) => {
 
   return (
     <main>
-      <section>
+      <section className="bandClass">
         <header>
           <p>{band.category ? band.category.toUpperCase() : 'N/A'}</p>
           <h1>{band.title || 'Untitled'}</h1>
