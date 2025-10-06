@@ -22,21 +22,21 @@ const validateToken = async (token) => {
 
 const signUp = async (formData) => {
   try {
-    console.log('signUp payload:', { formData, body: JSON.stringify(formData) }); // Debug
+    console.log('signUp payload:', { formData, body: JSON.stringify(formData) });
     const res = await fetch(`${BASE_URL}/sign-up`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData),
     });
     const data = await res.json();
-    console.log('signUp response:', data); // Debug
+    console.log('signUp response:', data);
     if (data.err) {
       throw new Error(data.err);
     }
     if (data.token) {
-      await validateToken(data.token); // Validate before storing
+      await validateToken(data.token);
       localStorage.setItem('token', data.token);
-      return JSON.parse(atob(data.token.split('.')[1])); // Remove .payload
+      return JSON.parse(atob(data.token.split('.')[1]));
     }
     throw new Error('Invalid response from server');
   } catch (err) {
@@ -47,21 +47,21 @@ const signUp = async (formData) => {
 
 const signIn = async (formData) => {
   try {
-    console.log('signIn payload:', { formData, body: JSON.stringify(formData) }); // Debug
+    console.log('signIn payload:', { formData, body: JSON.stringify(formData) });
     const res = await fetch(`${BASE_URL}/sign-in`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData),
     });
     const data = await res.json();
-    console.log('signIn response:', data); // Debug
+    console.log('signIn response:', data);
     if (data.err) {
       throw new Error(data.err);
     }
     if (data.token) {
-      await validateToken(data.token); // Validate before storing
+      await validateToken(data.token);
       localStorage.setItem('token', data.token);
-      return JSON.parse(atob(data.token.split('.')[1])); // Remove .payload
+      return JSON.parse(atob(data.token.split('.')[1]));
     }
     throw new Error('Invalid response from server');
   } catch (err) {

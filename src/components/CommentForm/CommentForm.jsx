@@ -52,7 +52,7 @@ const CommentForm = ({ handleAddComment, handleUpdateComment }) => {
       if (commentId) {
         await handleUpdateComment(String(gigId), commentId, commentData);
       } else {
-        await handleAddComment(commentData, String(gigId)); // Fix: Swap arguments to match App.jsx
+        await handleAddComment(commentData, String(gigId));
       }
       navigate(`/gigs/${gigId}`);
     } catch (error) {
