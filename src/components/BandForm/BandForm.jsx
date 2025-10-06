@@ -60,7 +60,7 @@ const BandForm = (props) => {
           <option value="Folk/World">Folk/World</option>
         </select>
         
-      <button type="submit">Create Band</button>
+      <button type="submit">Create Show</button>
     </form>
   );
 };
