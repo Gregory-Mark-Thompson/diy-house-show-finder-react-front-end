@@ -18,6 +18,7 @@ import BandForm from './components/BandForm/BandForm';
 import BandList from './components/BandList/BandList';
 
 const App = () => {
+  const [reset, setReset] = useState(false);
   const navigate = useNavigate();
   const [gigs, setGigs] = useState([]);
   const { user, setUser } = useContext(UserContext);
@@ -57,6 +58,17 @@ const App = () => {
     validateToken();
     return () => { isMounted = false; };
   }, [setUser]);
+
+  const handleBandSearch = async (bandSearchCategory) => {
+    try {
+      const bands = await bandService.indexBand(bandSearchCategory);
+      setBands(bands);
+      setReset(false);
+    } catch (error) {
+      console.error('Error selecting category:', error);
+      throw error;
+    }
+  };
 
   const handleAddGig = async (gigFormData) => {
     try {
@@ -146,7 +158,7 @@ const App = () => {
   useEffect(() => {
     const fetchBands = async () => {
       try {
-        const bandsData = await bandService.indexBand();
+        const bandsData = await bandService.indexBand('');
         setBands(Array.isArray(bandsData) ? bandsData : []);
       } catch (error) {
         console.error('Error fetching bands:', error);
@@ -154,7 +166,7 @@ const App = () => {
       }
     };
     fetchBands();
-  }, []);
+  }, [reset]);
 
   useEffect(() => {
     const fetchGigs = async () => {
@@ -173,10 +185,10 @@ const App = () => {
 
   return (
     <>
-      <NavBar />
+      <NavBar setReset={setReset}/>
       <Routes>
         <Route path="/" element={user ? <Dashboard /> : <Landing />} />
-        <Route path="/bands" element={<BandList bands={bands} />} />
+        <Route path="/bands" element={<BandList handleBandSearch={handleBandSearch} bands={bands} />} />
         <Route
           path="/bands/:bandId"
           element={

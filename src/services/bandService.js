@@ -1,10 +1,10 @@
 const BASE_URL = `${import.meta.env.VITE_BACK_END_SERVER_URL}/bands`;
 
-const indexBand = async () => {
+const indexBand = async (category) => {
   try {
     const token = localStorage.getItem('token');
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
-    const res = await fetch(BASE_URL, {
+    const res = await fetch(`${BASE_URL}?category=${category}`, {
       headers,
     });
     if (!res.ok) throw new Error(`Failed to fetch bands: ${res.status}`);
@@ -90,4 +90,19 @@ const updateBand = async (bandId, bandFormData) => {
   }
 };
 
-export { indexBand, showBand, createBand, deleteBand, updateBand };
+const getBands = async (category) => {
+  try {
+    const token = localStorage.getItem('token');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    const res = await fetch(`${BASE_URL}?category=${category}`, {
+      headers,
+    });
+    if (!res.ok) throw new Error(`Failed to fetch bands: ${res.status}`);
+    return res.json();
+  } catch (error) {
+    console.error('indexBand error:', error.message);
+    return [];
+  }
+};
+
+export { indexBand, showBand, createBand, deleteBand, updateBand, getBands };

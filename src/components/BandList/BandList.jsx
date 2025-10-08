@@ -1,8 +1,28 @@
 import { Link } from 'react-router-dom';
 
 const BandList = (props) => {
+  const handleChange = (evt) => {
+    props.handleBandSearch( evt.target.value );
+  };
   return (
     <main>
+      <select
+        required
+        name="category"
+        id="category-input"
+    //    value={formData.category}
+        onChange={handleChange}
+        >
+          <option value="">All Shows</option>
+          <option value="Rock">Rock</option>
+          <option value="Metal">Metal</option>
+          <option value="Punk">Punk</option>
+          <option value="R&B">R&B</option>
+          <option value="Rap">Rap</option>
+          <option value="Techno/Electronic">Techno/Electronic</option>
+          <option value="Country">Country</option>
+          <option value="Folk/World">Folk/World</option>
+        </select>
       {props.bands && Array.isArray(props.bands) ? (
         props.bands.map((band) => (
           band && band._id ? (
