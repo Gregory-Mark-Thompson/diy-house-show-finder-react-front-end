@@ -12,13 +12,11 @@ import { UserContext } from './contexts/UserContext';
 import GigDetails from './components/GigDetails/GigDetails';
 import GigForm from './components/GigForm/GigForm';
 import CommentForm from './components/CommentForm/CommentForm';
-import * as bandService from './services/bandService';
 import BandDetails from './components/BandDetails/BandDetails';
 import BandForm from './components/BandForm/BandForm';
 import BandList from './components/BandList/BandList';
 
 const App = () => {
-  const [reset, setReset] = useState(false);
   const navigate = useNavigate();
   const [gigs, setGigs] = useState([]);
   const { user, setUser } = useContext(UserContext);
@@ -58,17 +56,6 @@ const App = () => {
     validateToken();
     return () => { isMounted = false; };
   }, [setUser]);
-
-  const handleBandSearch = async (bandSearchCategory) => {
-    try {
-      const bands = await bandService.indexBand(bandSearchCategory);
-      setBands(bands);
-      setReset(false);
-    } catch (error) {
-      console.error('Error selecting category:', error);
-      throw error;
-    }
-  };
 
   const handleAddGig = async (gigFormData) => {
     try {
@@ -123,50 +110,17 @@ const App = () => {
     }
   };
 
-  const handleAddBand = async (bandFormData) => {
-    try {
-      const newBand = await bandService.createBand(bandFormData);
-      setBands([newBand, ...bands]);
-      navigate('/bands');
-    } catch (error) {
-      console.error('Error adding band:', error);
-      throw error;
-    }
-  };
+  // const handleUpdateBand = async (bandId, bandFormData) => {
+  //   try {
+  //     const updatedBand = await bandService.updateBand(bandId, bandFormData);
+  //     setBands(bands.map((band) => (band._id === bandId ? updatedBand : band)));
+  //     navigate(`/bands/${bandId}`);
+  //   } catch (error) {
+  //     console.error('Error updating band:', error);
+  //     throw error;
+  //   }
+  // };
 
-  const handleDeleteBand = async (bandId) => {
-    try {
-      await bandService.deleteBand(bandId);
-      setBands(bands.filter((band) => band._id !== bandId));
-      navigate('/bands');
-    } catch (error) {
-      console.error('Error deleting band:', error);
-    }
-  };
-
-  const handleUpdateBand = async (bandId, bandFormData) => {
-    try {
-      const updatedBand = await bandService.updateBand(bandId, bandFormData);
-      setBands(bands.map((band) => (band._id === bandId ? updatedBand : band)));
-      navigate(`/bands/${bandId}`);
-    } catch (error) {
-      console.error('Error updating band:', error);
-      throw error;
-    }
-  };
-
-  useEffect(() => {
-    const fetchBands = async () => {
-      try {
-        const bandsData = await bandService.indexBand('');
-        setBands(Array.isArray(bandsData) ? bandsData : []);
-      } catch (error) {
-        console.error('Error fetching bands:', error);
-        setBands([]);
-      }
-    };
-    fetchBands();
-  }, [reset]);
 
   useEffect(() => {
     const fetchGigs = async () => {
@@ -185,15 +139,15 @@ const App = () => {
 
   return (
     <>
-      <NavBar setReset={setReset}/>
+      <NavBar
+      />
       <Routes>
         <Route path="/" element={user ? <Dashboard /> : <Landing />} />
-        <Route path="/bands" element={<BandList handleBandSearch={handleBandSearch} bands={bands} />} />
+        <Route path="/bands" element={<BandList />} />
         <Route
           path="/bands/:bandId"
           element={
             <BandDetails
-              handleDeleteBand={handleDeleteBand}
               user={user}
             />
           }
@@ -201,10 +155,10 @@ const App = () => {
         {user ? (
           <>
             <Route path="/gigs" element={<GigList gigs={gigs} />} />
-            <Route path="/bands/new" element={<BandForm handleAddBand={handleAddBand} />} />
+            <Route path="/bands/new" element={<BandForm />} />
             <Route
               path="/bands/:bandId/edit"
-              element={<BandForm handleUpdateBand={handleUpdateBand} />}
+              element={<BandForm />}
             />
             <Route path="/gigs/:gigId" element={<GigDetails handleDeleteGig={handleDeleteGig} />} />
             <Route path="/gigs/new" element={<GigForm handleAddGig={handleAddGig} />} />

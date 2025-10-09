@@ -1,11 +1,25 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import * as bandService from "../../services/bandService"
 
 const BandForm = (props) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
     text: '',
     category: 'Rock',
   });
+
+  // const handleAddBand = async (bandFormData) => {
+  //    try {
+
+  //      setBands([newBand, ...bands]);
+
+  //    } catch (error) {
+  //      console.error('Error adding band:', error);
+  //      throw error;
+  //    }
+  //  };
 
   const handleChange = (evt) => {
     setFormData({ ...formData, [evt.target.name]: evt.target.value });
@@ -14,7 +28,8 @@ const BandForm = (props) => {
   const handleSubmit = async (evt) => {
     evt.preventDefault();
     try {
-      await props.handleAddBand(formData);
+      const newBand = await bandService.createBand(formData);
+      navigate('/bands');
       setFormData({ title: '', text: '', category: 'Rock' });
     } catch (err) {
       alert('Failed to create band: ' + err.message);

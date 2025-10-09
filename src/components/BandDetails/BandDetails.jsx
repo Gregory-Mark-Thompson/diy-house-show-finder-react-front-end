@@ -1,11 +1,24 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import * as bandService from '../../services/bandService';
 
-const BandDetails = ({ handleDeleteBand, user }) => {
+
+
+const BandDetails = ({ user }) => {
   const { bandId } = useParams();
   const [band, setBand] = useState(null);
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate ();
+
+ const handleDeleteBand = async (bandId) => {
+    try {
+      await bandService.deleteBand(bandId);
+      navigate('/bands');
+    } catch (error) {
+      console.error('Error deleting band:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchBand = async () => {
@@ -26,7 +39,7 @@ const BandDetails = ({ handleDeleteBand, user }) => {
     };
     fetchBand();
   }, [bandId]);
-
+console.log(user);
   console.log('bandId:', bandId);
   console.log('band state:', band);
   console.log('error state:', error);
@@ -45,7 +58,7 @@ const BandDetails = ({ handleDeleteBand, user }) => {
               ? `${band.author.username} posted on ${new Date(band.createdAt || Date.now()).toLocaleDateString()}`
               : `Posted on ${new Date(band.createdAt || Date.now()).toLocaleDateString()}`}
           </p>
-          {band.author && band.author._id === user?._id && handleDeleteBand && (
+          {band.author && band.author._id === user._id && (
             <button onClick={() => handleDeleteBand(bandId)}>Delete</button>
           )}
         </header>

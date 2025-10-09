@@ -1,16 +1,44 @@
 import { Link } from 'react-router-dom';
-
+import * as bandService from '../../services/bandService';
+import { useState, useEffect } from 'react';
 const BandList = (props) => {
+  const [bands, setBands] = useState([]);
   const handleChange = (evt) => {
-    props.handleBandSearch( evt.target.value );
+  handleBandSearch( evt.target.value );
   };
+
+  const handleBandSearch = async (bandSearchCategory) => {
+    try {
+      const bands = await bandService.indexBand(bandSearchCategory);
+      setBands(bands);
+//      setReset(false);
+    } catch (error) {
+      console.error('Error selecting category:', error);
+      throw error;
+    }
+  };
+
+console.log(bands)
+  useEffect(() => {
+    const fetchBands = async () => {
+      try {
+        const bandsData = await bandService.indexBand('');
+        setBands(Array.isArray(bandsData) ? bandsData : []);
+      } catch (error) {
+        console.error('Error fetching bands:', error);
+        setBands([navigate]);
+      }
+    };
+    fetchBands();
+  }, []);
+ // }, [reset]);
+
   return (
     <main>
       <select
         required
         name="category"
         id="category-input"
-    //    value={formData.category}
         onChange={handleChange}
         >
           <option value="">All Shows</option>
@@ -22,9 +50,9 @@ const BandList = (props) => {
           <option value="Techno/Electronic">Techno/Electronic</option>
           <option value="Country">Country</option>
           <option value="Folk/World">Folk/World</option>
-        </select>
-      {props.bands && Array.isArray(props.bands) ? (
-        props.bands.map((band) => (
+      </select>
+      {bands && Array.isArray(bands) ? (
+        bands.map((band) => (
           band && band._id ? (
             <Link key={band._id} to={`/bands/${band._id}`}>
               <article className="bandList">
