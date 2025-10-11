@@ -58,11 +58,24 @@ console.log(user);
               ? `${band.author.username} posted on ${new Date(band.createdAt || Date.now()).toLocaleDateString()}`
               : `Posted on ${new Date(band.createdAt || Date.now()).toLocaleDateString()}`}
           </p>
-          {band.author && band.author._id === user._id && (
+          {user && band.author && band.author._id === user._id && (
             <button onClick={() => handleDeleteBand(bandId)}>Delete</button>
           )}
         </header>
-        <p>{band.text || 'No description'}</p>
+        <p><strong>Place: </strong>{band.location || 'No location listed'}</p>
+              <p><strong>Day & Time: </strong>
+                {band.date
+                  ? new Date(band.date).toLocaleString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true,
+                    })
+                  : 'No date or time listed'}
+              </p>
+        <p style = {{maxWidth: "50%"}}><strong>Show Details: </strong>{band.text || 'No description'}</p>
       </section>
     </main>
   );

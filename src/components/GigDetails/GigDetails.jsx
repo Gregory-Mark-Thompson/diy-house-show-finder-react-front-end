@@ -70,7 +70,20 @@ const handleAddComment = async (commentFormData, gigIdFromForm) => {
             </>
           )}
         </header>
-        <p>{gig.text || 'No description'}</p>
+        <p><strong>Place: </strong>{gig.location || 'No location listed'}</p>
+              <p><strong>Day & Time: </strong>
+                {gig.date
+                  ? new Date(gig.date).toLocaleString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true, // Use 12-hour format with AM/PM
+                    })
+                  : 'No date or time listed'}
+              </p>
+        <p style = {{maxWidth: "50%"}}><strong>Gig Details: </strong>{gig.text || 'No description'}</p>
       </section>
       <section>
         <h2>Comments</h2>

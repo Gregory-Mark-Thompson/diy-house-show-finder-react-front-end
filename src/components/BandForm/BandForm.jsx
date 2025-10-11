@@ -47,6 +47,24 @@ const BandForm = (props) => {
         value={formData.title}
         onChange={handleChange}
       />
+      <label htmlFor='location-input'>Location</label>
+      <input
+        required
+        type='text'
+        name='location'
+        id='location-input'
+        value={formData.location}
+        onChange={handleChange}
+      />
+      <label htmlFor='date-input'>Date</label>
+        <input
+          required
+          type='datetime-local'
+          name='date'
+          id='date-input'
+          value={formData.date}
+          onChange={handleChange}
+        />
 
       <label htmlFor="text-input">Description</label>
       <textarea

@@ -64,7 +64,20 @@ console.log(bands)
                       : `Posted on ${new Date(band.createdAt || Date.now()).toLocaleDateString()}`}
                   </p>
                 </header>
-                <p>{band.text || 'No description'}</p>
+                <p><strong>Place: </strong>{band.location || 'No location listed'}</p>
+                <p><strong>Day & Time: </strong>
+                {band.date
+                  ? new Date(band.date).toLocaleString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true, // Use 12-hour format with AM/PM
+                    })
+                  : 'No date or time listed'}
+              </p>
+                <p style = {{maxWidth: "50%"}}><strong>Show Details: </strong>{band.text || 'No description'}</p>
               </article>
             </Link>
           ) : null
